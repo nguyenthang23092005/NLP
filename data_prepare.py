@@ -18,9 +18,9 @@ def clean_text(text):
     if not text:
         return ""
     text = str(text)
-    text = text.replace("\xa0", " ").replace("_", " ").replace("-", " ").replace("\\", " ")
+    text = re.sub(r"[\xa0_\-\\/*]", " ", text)
     text = re.sub(r"\s+", " ", text)
-    return text.strip()
+    return text.lower().strip()
 
 for input_file in input_files:
     if not os.path.exists(input_file):
