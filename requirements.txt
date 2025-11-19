@@ -1,0 +1,28 @@
+# Dependencies cho Streamlit app
+streamlit>=1.28.0
+PyPDF2>=3.0.0
+python-docx>=1.0.0
+docx2txt>=0.8
+
+# Existing dependencies
+torch>=2.0.0
+transformers>=4.30.0
+datasets>=2.14.0
+evaluate>=0.4.0
+rouge-score>=0.1.2
+tensorboard>=2.13.0
+
+# Data processing
+numpy>=1.24.0
+pandas>=2.0.0
+
+# Vietnamese NLP
+pyvi>=0.1.1
+ujson>=5.8.0
+
+# Optional: for better performance
+accelerate>=0.20.0
+sentencepiece>=0.1.99
+
+# LoRA/adapter training
+peft>=0.4.0
