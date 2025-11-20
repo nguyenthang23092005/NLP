@@ -1,176 +1,140 @@
-# Vietnamese Text Summarization with mT5
+# 📝 README — Đồ án NLP: Tóm tắt văn bản tiếng Việt
 
-Dự án fine-tune mô hình mT5 cho tóm tắt văn bản tiếng Việt với LoRA và CPO.
+## 📌 Môn học
+**Xử lý Ngôn ngữ Tự nhiên (NLP)**  
+**Nhóm:** 25  
+**Giảng viên:** PGS.TS. Phạm Tiến Lâm
 
-## 📋 Tổng quan
+**Đề tài:**  
+**Xây dựng mô hình ngôn ngữ tóm tắt văn bản tiếng Việt bằng mT5 + LoRA + CPO**
 
-- **Mô hình base**: google/mt5-small
-- **Kỹ thuật**: LoRA (Parameter-Efficient Fine-Tuning) + CPO (Contrastive Preference Optimization)
-- **Dataset**: Vietnamese news articles (80k+ samples)
-- **Framework**: HuggingFace Transformers, PEFT, TRL
+---
 
-## 🚀 Cài đặt
+## 👥 Thành viên nhóm
+| STT | Họ và tên | MSSV | Vai trò |
+|-----|-----------|-------|---------|
+| 1 | **Nguyễn Văn Thăng** (Nhóm trưởng) | 23010572 | Xử lý dữ liệu, nghiên cứu mô hình, fine-tune, đánh giá, triển khai |
+| 2 | **Phạm Văn Sự** | 23010523 | Khảo sát phương pháp, xây dựng mô hình, đánh giá & viết báo cáo |
+| 3 | **Đặng Anh Tuyền** | 23010912 | Thu thập dữ liệu, xây dựng mô hình, đánh giá |
+| 4 | **Nguyễn Thị Nhung** | 23010607 | Thu thập dữ liệu, xử lý, xây dựng mô hình, đánh giá |
 
-```bash
-# Clone repository
-git clone <repo-url>
-cd NLP
+---
 
-# Cài đặt dependencies
+# 🚀 1. Giới thiệu đề tài
+Mục tiêu đề tài:
+- Xây dựng hệ thống **tóm tắt bài báo tiếng Việt** tự động.  
+- Sử dụng mô hình **mT5-small**.  
+- Tối ưu chi phí train bằng **LoRA**.  
+- Tăng chất lượng sinh văn bản bằng **CPO**.  
+- Đánh giá bằng **ROUGE, BLEU, METEOR**.  
+- Xây dựng giao diện demo.
+
+---
+
+# 🧠 2. Pipeline tổng quan
+```
+RAW DATA
+   │
+   ├── 1. Thu thập dữ liệu từ 3 bộ:
+   │       VietNews, VNONews, NewsDatasetVN
+   │
+   ├── 2. Tiền xử lý:
+   │       - Loại ký tự nhiễu  
+   │       - Chuẩn hóa Unicode  
+   │       - Lowercase  
+   │       - Chuẩn hóa khoảng trắng  
+   │       - Loại mẫu trống
+   │
+   ├── 3. Chia dữ liệu:
+   │       train (80%) - val (10%) - test (10%)
+   │
+   ├── 4. Giai đoạn 1:
+   │       Fine-tune mT5 + LoRA
+   │       - ROUGE evaluation
+   │
+   ├── 5. Giai đoạn 2:
+   │       Huấn luyện CPO
+   │       - ROUGE evaluation
+   │
+   ├── 6. Đánh giá:
+   │       ROUGE-1/2/L, BLEU, METEOR
+   │
+   └── 7. Triển khai:
+           - checkpoint stage1 / stage2
+           - giao diện web
+```
+
+---
+
+# 📂 3. Cấu trúc thư mục dự án
+```
+📦 NLP-Summarization
+.
+├── data
+│   ├── cpo_splits/
+│   ├── splits/
+│   └── processed_dataset.json
+├── data_raw
+│   ├── News_Dataset_Vietnamese.json
+│   ├── Vietnamese_Online_News_Dataset.json
+│   └── vietnews.json
+├── metrics
+│   ├── predictions_lora_cpo_metrics.json
+│   ├── predictions_lora_metrics.json
+│   └── predictions_mt5small_metrics.json
+├── models
+│   ├── mt5-cpo/
+│   ├── mt5-cpo-full/
+│   ├── mt5-lora-full/
+│   ├── mt5-lora-v2/
+│   └── mt5-small/
+│
+├── pred
+│   ├── predictions_lora_cpo.jsonl
+│   ├── predictions_lora.jsonl
+│   └── predictions_mt5small.jsonl
+│
+├── .gitignore
+├── README.md
+├── requirements.txt
+│
+├── app.py
+├── check_data.py
+├── check_gpu.py
+├── data_processing.py
+├── data_visualization.ipynb
+├── evaluate_model.py
+├── load_model.py
+├── train_cpo.py
+├── train_lora.py
+└── training_visualization.ipynb
+
+```
+
+---
+
+# 🛠 4. Hướng dẫn cài đặt
+### 1️⃣ Cài môi trường
+```
 pip install -r requirements.txt
-
-# Kiểm tra GPU
-python check_gpu.py
 ```
 
-## 📊 Chuẩn bị dữ liệu
+---
 
-```bash
-# Xử lý raw data thành processed_dataset.json
-python data_processing.py
 
-# Tạo train/test/validation splits
-python recreate_splits.py
+# ✨ 5. Chạy mô hình tóm tắt
+```
+python streamlit run app.py
 ```
 
-Dữ liệu sau khi xử lý:
-- `data/processed_dataset.json`: Dữ liệu đã clean
-- `data/splits/`: Train/test/validation splits (80/10/10)
-- `data/cpo_splits/`: Preference pairs cho CPO training
+---
 
-## 🎯 Training
+# 📊 6. Kết quả mô hình
+| Metric | Base | LoRA | LoRA + CPO |
+|--------|-------|-------|------|
+| ROUGE-1 | 5.54 | 51.95 | 52.97 |
+| ROUGE-2 | 1.62 | 25.11 | 25.85 |
+| ROUGE-L | 5.54 | 51.92 | 52.94 |
+| ROUGE-Lsum | 5.54 | 51.92 | 52.94 |
 
-### 1. Training LoRA (SFT)
 
-```bash
-# Full dataset
-python train_lora.py
-
-# Quick test với 1000 samples
-python train_lora.py --max_samples 1000 --num_train_epochs 3 --output_dir ./models/mt5-lora-1k
-```
-
-### 2. Training CPO
-
-```bash
-# Train CPO trên model đã fine-tune LoRA
-python train_cpo.py --model_path ./models/mt5-lora-full
-```
-
-### 3. Two-Stage Training (SFT + CPO)
-
-```bash
-# Tự động train 2 giai đoạn
-python train_two_stage.py --max_samples 5000 --sft_num_epochs 5 --cpo_num_epochs 3
-```
-
-### Tham số quan trọng
-
-| Tham số | SFT | CPO | Mô tả |
-|---------|-----|-----|-------|
-| `--max_samples` | ✓ | ✓ | Số samples train (None = full) |
-| `--num_train_epochs` | ✓ | - | Số epochs cho SFT |
-| `--learning_rate` | ✓ | ✓ | Learning rate (1e-4 cho SFT, 5e-5 cho CPO) |
-| `--batch_size` | ✓ | ✓ | Batch size per device |
-| `--output_dir` | ✓ | ✓ | Thư mục lưu model |
-
-## 📈 Đánh giá
-
-```bash
-# Evaluate model trên test set
-python evaluate_model.py \
-    --model_path ./models/mt5-lora-full/checkpoint-7728 \
-    --data_path data/splits \
-    --split test \
-    --output_file predictions_lora.jsonl
-
-# So sánh nhiều models
-python compare_models.py
-```
-
-Metrics: ROUGE-1, ROUGE-2, ROUGE-L
-
-## 🌐 Web Interface
-
-```bash
-# Chạy Streamlit app
-streamlit run app.py
-```
-
-Features:
-- Upload file (PDF, DOC, DOCX) hoặc nhập text
-- Chọn model (LoRA SFT, CPO, DPO, Base mT5)
-- Xem và tải kết quả tóm tắt
-- Hiển thị thống kê độ dài
-
-## 📁 Cấu trúc thư mục
-
-```
-NLP/
-├── data/
-│   ├── processed_dataset.json      # Dữ liệu đã xử lý
-│   ├── splits/                     # Train/test/val splits
-│   └── cpo_splits/                 # CPO preference pairs
-├── models/
-│   ├── mt5-lora-full/             # Model LoRA full dataset
-│   ├── mt5-lora-1k/               # Model LoRA 1k samples
-│   └── mt5-lora-cpo/              # Model sau CPO
-├── train_lora.py                   # Training script LoRA
-├── train_cpo.py                    # Training script CPO
-├── train_two_stage.py              # 2-stage training
-├── evaluate_model.py               # Đánh giá model
-├── app.py                          # Streamlit web app
-└── data_processing.py              # Xử lý raw data
-```
-
-## 🔧 Scripts hỗ trợ
-
-- `check_gpu.py`: Kiểm tra GPU availability và VRAM
-- `check_data.py`: Xem thống kê dataset
-- `recreate_splits.py`: Tạo lại train/test/val splits
-- `visualization.ipynb`: Visualize training metrics
-
-## 💡 Tips
-
-**Để train nhanh với ít dữ liệu:**
-```bash
-python train_lora.py --max_samples 1000 --num_train_epochs 3 --output_dir ./models/test
-```
-
-**Để train full với best performance:**
-```bash
-python train_two_stage.py --sft_num_epochs 5 --cpo_num_epochs 3
-```
-
-**Nếu thiếu VRAM:**
-- Giảm `--per_device_train_batch_size` xuống 2 hoặc 1
-- Tăng `--gradient_accumulation_steps` lên 8 hoặc 16
-
-## 📝 Tài liệu thêm
-
-- [TRAIN_EXPLAINED.md](TRAIN_EXPLAINED.md): Chi tiết về training process
-- [CPO_EXPLAINED.md](CPO_EXPLAINED.md): Giải thích CPO algorithm
-- [DPO_EXPLAINED.md](DPO_EXPLAINED.md): Giải thích DPO algorithm
-- [QUICKSTART.md](QUICKSTART.md): Hướng dẫn nhanh
-- [APP_GUIDE.md](APP_GUIDE.md): Hướng dẫn sử dụng web app
-
-## 📊 Kết quả
-
-| Model | ROUGE-1 | ROUGE-2 | ROUGE-L |
-|-------|---------|---------|---------|
-| Base mT5 | - | - | - |
-| LoRA SFT | - | - | - |
-| LoRA + CPO | - | - | - |
-
-*(Chạy evaluate_model.py để cập nhật)*
-
-## 🤝 Contributing
-
-Pull requests welcome! Hãy đảm bảo code của bạn:
-- Follow PEP 8 style guide
-- Có docstrings cho functions
-- Test trước khi commit
-
-## 📄 License
-
-MIT License
