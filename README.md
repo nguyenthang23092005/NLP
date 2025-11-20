@@ -1,4 +1,4 @@
-# 📝 README — Đồ án NLP: Tóm tắt văn bản tiếng Việt
+# Bài tập lớn NLP: Xây dựng mô hình ngôn ngữ tóm tắt văn bản tiếng Việt
 
 ## 📌 Môn học
 **Xử lý Ngôn ngữ Tự nhiên (NLP)**  
