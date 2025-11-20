@@ -114,11 +114,14 @@ RAW DATA
 ---
 
 # 🛠 4. Hướng dẫn cài đặt
-### 1️⃣ Cài môi trường
+###  Cài môi trường
 ```
 pip install -r requirements.txt
 ```
-
+###  Tải mô hình 
+`
+https://drive.google.com/drive/folders/1Ba67xZ7crlWXvyBkCcXhcw3U9UPgHX4P
+`
 ---
 
 
